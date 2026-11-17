@@ -1,0 +1,22 @@
+name: NexusCore
+version: '${version}'
+main: com.zombiehdgaming.nexuscore.NexusCorePlugin
+description: Core server functionality for Nexus servers - sidebar scoreboards, tab list and more.
+authors: [ZombieHDGaming]
+api-version: '26.3'
+folia-supported: true
+
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+      join-classpath: true
+
+permissions:
+  nexuscore.command.admin:
+    description: Access to /nexuscore (reload, info, forcing boards/layouts).
+    default: op
+  nexuscore.command.sidebar:
+    description: Toggle your own sidebar with /sidebar.
+    default: true

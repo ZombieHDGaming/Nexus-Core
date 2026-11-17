@@ -1,0 +1,81 @@
+# ============================================================================
+#  Sidebar scoreboards
+#  Apply changes with /nexuscore reload
+# ============================================================================
+#
+#  TEXT FORMAT
+#    MiniMessage: https://docs.advntr.dev/minimessage/format.html
+#    e.g. <red>, <#ff8800>, <gradient:#8b5cf6:#22d3ee>text</gradient>, <bold>, <rainbow>
+#
+#  PLACEHOLDERS
+#    %nexus_<key>%   Built in, no dependencies:
+#                    player, displayname, uuid, world, online, max_players, ping,
+#                    x, y, z, health, food, level, gamemode
+#    %anything%      Any other placeholder is resolved through PlaceholderAPI when installed.
+#                    Legacy colours (&a, &#ff8800) in PlaceholderAPI results are kept.
+#    Unknown placeholders are shown as written, so typos are easy to spot.
+#
+#  ANIMATIONS
+#    <animation:name>  inserts the current frame of an animation from animations.yml
+#
+#  CHOOSING A BOARD
+#    Every board has a priority and optional conditions. Each player sees the
+#    highest-priority board whose conditions ALL match. Conditions are re-checked
+#    on every refresh and immediately on world / game mode change.
+#
+#    conditions:
+#      worlds: [world, world_nether]         player is in one of these worlds
+#      exclude-worlds: [minigames]           player is NOT in any of these worlds
+#      permission: some.permission           player has the permission (or a list: all required)
+#      gamemodes: [survival, adventure]      player is in one of these game modes
+#
+#    An unknown or invalid condition never matches (and is reported in the console),
+#    so a typo hides a board instead of showing it to everyone.
+#
+#  OTHER OPTIONS
+#    update-interval  ticks between refreshes (20 = 1 second). Only changed lines are
+#                     sent to the player, so frequent updates are cheap.
+#    lines            at most 15. Empty strings ("") make blank lines.
+
+boards:
+
+  default:
+    priority: 0
+    update-interval: 20
+    title: "<animation:title>"
+    lines:
+      - "<dark_gray><st>                        </st>"
+      - "<gray>Player <dark_gray>» <white>%nexus_player%"
+      - "<gray>World <dark_gray>» <white>%nexus_world%"
+      - "<gray>Ping <dark_gray>» <white>%nexus_ping%ms"
+      - ""
+      - "<gray>Online <dark_gray>» <green>%nexus_online%<dark_gray>/</dark_gray><gray>%nexus_max_players%"
+      - ""
+      - "<animation:tips>"
+      - "<dark_gray><st>                        </st>"
+
+  nether:
+    priority: 10
+    conditions:
+      worlds: [world_nether]
+    update-interval: 10
+    title: "<gradient:#ef4444:#f97316><bold>THE NETHER</bold></gradient>"
+    lines:
+      - "<dark_gray><st>                        </st>"
+      - "<gray>Health <dark_gray>» <red>%nexus_health%❤"
+      - "<gray>Food <dark_gray>» <gold>%nexus_food%"
+      - ""
+      - "<gray>X <white>%nexus_x% <gray>Y <white>%nexus_y% <gray>Z <white>%nexus_z%"
+      - "<dark_gray><st>                        </st>"
+
+  staff:
+    priority: 100
+    conditions:
+      permission: nexuscore.board.staff
+      gamemodes: [creative, spectator]
+    update-interval: 20
+    title: "<red><bold>STAFF</bold></red>"
+    lines:
+      - "<gray>Online <dark_gray>» <white>%nexus_online%"
+      - "<gray>Mode <dark_gray>» <white>%nexus_gamemode%"
+      - "<gray>Ping <dark_gray>» <white>%nexus_ping%ms"

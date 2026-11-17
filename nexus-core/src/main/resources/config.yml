@@ -1,0 +1,22 @@
+# ============================================================================
+#  Nexus-Core - main configuration
+#  Apply changes with /nexuscore reload (no restart needed).
+# ============================================================================
+
+# Do not change. Used to tell you when new options are available.
+config-version: 1
+
+# Switch whole features on or off. Disabled features use no resources.
+features:
+  scoreboard: true   # sidebar scoreboards, see scoreboards.yml
+  tablist: true      # tab list header & footer, see tablist.yml
+
+placeholders:
+  # When PlaceholderAPI is installed, also expose Nexus-Core's own placeholders
+  # (%nexus_online%, %nexus_ping%, ...) to every other plugin through it.
+  register-expansion: true
+
+scoreboard:
+  # Whether players see the sidebar until they turn it off with /sidebar.
+  # A player's own choice is remembered across restarts and always wins.
+  default-visible: true
