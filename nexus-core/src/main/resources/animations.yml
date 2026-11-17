@@ -1,0 +1,31 @@
+# ============================================================================
+#  Animations - use anywhere in scoreboards.yml / tablist.yml with <animation:name>
+# ============================================================================
+#
+#  interval: ticks each frame is shown (20 ticks = 1 second)
+#  frames:   MiniMessage text; placeholders and other animations may be used inside frames
+#
+#  Displays that use an animation refresh automatically at least as fast as the animation,
+#  regardless of their own update-interval. All players see the same frame at the same time.
+
+animations:
+  title:
+    interval: 2
+    frames:
+      - "<gradient:#8b5cf6:#22d3ee:0.0><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.2><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.4><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.6><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.8><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:1.0><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.8><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.6><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.4><bold>NEXUS</bold></gradient>"
+      - "<gradient:#8b5cf6:#22d3ee:0.2><bold>NEXUS</bold></gradient>"
+
+  tips:
+    interval: 100
+    frames:
+      - "<gray>Toggle this board with <white>/sidebar</white>"
+      - "<gray>Edit me in <white>scoreboards.yml</white>"
+      - "<gray>Your ping: <white>%nexus_ping%ms</white>"

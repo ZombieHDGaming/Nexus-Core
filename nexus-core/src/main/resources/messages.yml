@@ -1,0 +1,22 @@
+# Chat messages, in MiniMessage format: https://docs.advntr.dev/minimessage/format.html
+# <prefix> can be used in any message.
+
+prefix: "<gradient:#8b5cf6:#22d3ee><bold>Nexus</bold></gradient> <dark_gray>»</dark_gray> "
+
+reload-success: "<prefix><green>Configuration reloaded in <white><time>ms</white>.</green>"
+reload-partial: "<prefix><yellow><count> problem(s) while reloading. Affected parts kept their previous configuration:</yellow>"
+reload-failure-entry: "<dark_gray> - </dark_gray><red><error></red>"
+
+info: |-
+  <prefix><gray>Nexus-Core <white><version></white>
+  <dark_gray> - </dark_gray><gray>Sidebar boards: <white><boards></white>
+  <dark_gray> - </dark_gray><gray>Tab layouts: <white><layouts></white>
+  <dark_gray> - </dark_gray><gray>PlaceholderAPI hooked: <white><papi></white>
+
+sidebar-shown: "<prefix><gray>Sidebar <green>shown</green>.</gray>"
+sidebar-hidden: "<prefix><gray>Sidebar <red>hidden</red>.</gray>"
+
+profile-forced: "<prefix><gray>Set <white><feature></white> for <white><player></white> to <white><profile></white>.</gray>"
+unknown-profile: "<prefix><red>Unknown profile <white><profile></white>.</red>"
+feature-disabled: "<prefix><red>The <white><feature></white> feature is disabled on this server.</red>"
+players-only: "<prefix><red>Only players can use this command.</red>"

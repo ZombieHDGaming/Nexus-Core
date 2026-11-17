@@ -1,0 +1,25 @@
+# ============================================================================
+#  Tab list header & footer
+#  Apply changes with /nexuscore reload
+# ============================================================================
+#
+#  Uses the same text format, placeholders, animations and conditions as
+#  scoreboards.yml - see the comments at the top of that file.
+#
+#  header / footer  a single string or a list of lines
+#  update-interval  ticks between refreshes; nothing is sent when the text is unchanged
+
+layouts:
+
+  default:
+    priority: 0
+    update-interval: 20
+    header:
+      - ""
+      - "<animation:title>"
+      - "<gray>Welcome, <white>%nexus_player%</white>!"
+      - ""
+    footer:
+      - ""
+      - "<gray>Online <dark_gray>» <green>%nexus_online%</green><dark_gray>/</dark_gray>%nexus_max_players%   <gray>Ping <dark_gray>» <white>%nexus_ping%ms"
+      - ""
