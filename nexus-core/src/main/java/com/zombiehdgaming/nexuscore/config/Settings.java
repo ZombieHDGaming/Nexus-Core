@@ -1,5 +1,6 @@
 package com.zombiehdgaming.nexuscore.config;
 
+import com.zombiehdgaming.nexuscore.scoreboard.ScoreNumbers;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -14,11 +15,13 @@ import org.slf4j.Logger;
  * @param features             per-feature on/off switches, keyed by feature id
  * @param registerExpansion    whether to expose {@code %nexus_*%} through PlaceholderAPI
  * @param sidebarDefaultVisible whether players see the sidebar until they toggle it off
+ * @param defaultScoreNumbers  score number mode for boards that do not set {@code score-numbers}
  */
 public record Settings(
         Map<String, Boolean> features,
         boolean registerExpansion,
-        boolean sidebarDefaultVisible
+        boolean sidebarDefaultVisible,
+        ScoreNumbers defaultScoreNumbers
 ) {
 
     public static final String FILE = "config.yml";
@@ -47,10 +50,19 @@ public record Settings(
             }
         }
 
+        final String rawNumbers = yaml.getString("scoreboard.default-score-numbers", "hidden");
+        ScoreNumbers scoreNumbers = ScoreNumbers.parse(rawNumbers);
+        if (scoreNumbers == null) {
+            logger.warn("{} > scoreboard.default-score-numbers: '{}' is not 'hidden' or 'shown'; using hidden",
+                    FILE, rawNumbers);
+            scoreNumbers = ScoreNumbers.HIDDEN;
+        }
+
         return new Settings(
                 Map.copyOf(features),
                 yaml.getBoolean("placeholders.register-expansion", true),
-                yaml.getBoolean("scoreboard.default-visible", true)
+                yaml.getBoolean("scoreboard.default-visible", true),
+                scoreNumbers
         );
     }
 

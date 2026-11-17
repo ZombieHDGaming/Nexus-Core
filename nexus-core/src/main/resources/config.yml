@@ -20,3 +20,8 @@ scoreboard:
   # Whether players see the sidebar until they turn it off with /sidebar.
   # A player's own choice is remembered across restarts and always wins.
   default-visible: true
+
+  # What appears on the right of sidebar lines, for boards that don't set their own
+  # 'score-numbers'. hidden = nothing (clean look), shown = red numbers counting down to 1.
+  # Lines with their own 'score' text always show that text instead.
+  default-score-numbers: hidden

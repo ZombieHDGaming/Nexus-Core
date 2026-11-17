@@ -3,6 +3,7 @@ package com.zombiehdgaming.nexuscore.scoreboard;
 import com.zombiehdgaming.nexuscore.api.scoreboard.ScoreboardService;
 import com.zombiehdgaming.nexuscore.condition.ConditionParser;
 import com.zombiehdgaming.nexuscore.config.ConfigException;
+import com.zombiehdgaming.nexuscore.config.Settings;
 import com.zombiehdgaming.nexuscore.config.YamlFiles;
 import com.zombiehdgaming.nexuscore.display.DisplayFeature;
 import com.zombiehdgaming.nexuscore.display.ProfileSet;
@@ -13,7 +14,7 @@ import com.zombiehdgaming.nexuscore.text.Template;
 import com.zombiehdgaming.nexuscore.text.TextService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -34,7 +35,7 @@ public final class ScoreboardFeature extends DisplayFeature<BoardProfile, Sideba
     private final TextService text;
     private final ConditionParser conditions;
     private final SidebarPacketSender sender;
-    private final BooleanSupplier defaultVisible;
+    private final Supplier<Settings> settings;
     /** Stored on the player, so the preference survives restarts with no database. */
     private final NamespacedKey visibilityKey;
 
@@ -44,13 +45,13 @@ public final class ScoreboardFeature extends DisplayFeature<BoardProfile, Sideba
             final TextService text,
             final ConditionParser conditions,
             final SidebarPacketSender sender,
-            final BooleanSupplier defaultVisible
+            final Supplier<Settings> settings
     ) {
         super(plugin, logger);
         this.text = text;
         this.conditions = conditions;
         this.sender = sender;
-        this.defaultVisible = defaultVisible;
+        this.settings = settings;
         this.visibilityKey = new NamespacedKey(plugin, "sidebar_visible");
     }
 
@@ -80,16 +81,11 @@ public final class ScoreboardFeature extends DisplayFeature<BoardProfile, Sideba
                 continue;
             }
 
-            List<String> rawLines = section.getStringList("lines");
-            if (rawLines.size() > Sidebar.MAX_LINES) {
-                logger.warn("{}: has {} lines but the sidebar shows at most {}; extra lines are ignored",
-                        path, rawLines.size(), Sidebar.MAX_LINES);
-                rawLines = rawLines.subList(0, Sidebar.MAX_LINES);
-            }
             final Template title = text.compile(section.getString("title", ""));
-            final List<Template> lines = text.compileAll(rawLines);
+            final List<BoardLine> lines = BoardLines.parse(section.getList("lines", List.of()), path, text, logger);
+            final ScoreNumbers scoreNumbers = scoreNumbers(section, path);
 
-            final List<Template> all = new ArrayList<>(lines);
+            final List<Template> all = BoardLines.templates(lines);
             all.add(title);
             loaded.add(new BoardProfile(
                     settings.id(),
@@ -97,13 +93,29 @@ public final class ScoreboardFeature extends DisplayFeature<BoardProfile, Sideba
                     settings.condition(),
                     text.effectiveInterval(all, settings.updateInterval()),
                     title,
-                    lines
+                    lines,
+                    scoreNumbers
             ));
         }
         if (loaded.isEmpty()) {
             logger.warn("{} defines no usable boards; nobody will see a sidebar", FILE);
         }
         return new ProfileSet<>(loaded);
+    }
+
+    private ScoreNumbers scoreNumbers(final ConfigurationSection section, final String path) {
+        final ScoreNumbers fallback = settings.get().defaultScoreNumbers();
+        final String raw = section.getString("score-numbers");
+        if (raw == null) {
+            return fallback;
+        }
+        final ScoreNumbers parsed = ScoreNumbers.parse(raw);
+        if (parsed == null) {
+            logger.warn("{}.score-numbers: '{}' is not 'hidden' or 'shown'; using {}",
+                    path, raw, fallback.name().toLowerCase(java.util.Locale.ROOT));
+            return fallback;
+        }
+        return parsed;
     }
 
     @Override
@@ -113,7 +125,7 @@ public final class ScoreboardFeature extends DisplayFeature<BoardProfile, Sideba
 
     @Override
     protected void render(final Player player, final BoardProfile profile, final Sidebar sidebar) {
-        sidebar.render(text.render(profile.title(), player), text.renderAll(profile.lines(), player));
+        sidebar.render(text.render(profile.title(), player), BoardLines.render(profile, player, text));
     }
 
     @Override
@@ -132,7 +144,7 @@ public final class ScoreboardFeature extends DisplayFeature<BoardProfile, Sideba
     public boolean isVisible(final Player player) {
         final PersistentDataContainer data = player.getPersistentDataContainer();
         final Boolean stored = data.get(visibilityKey, PersistentDataType.BOOLEAN);
-        return stored != null ? stored : defaultVisible.getAsBoolean();
+        return stored != null ? stored : settings.get().sidebarDefaultVisible();
     }
 
     @Override

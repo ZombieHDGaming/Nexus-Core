@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * One configured sidebar board.
+ *
+ * @param scoreNumbers what to show on the right of lines without their own {@code score} text
  */
 public record BoardProfile(
         String id,
@@ -14,7 +16,8 @@ public record BoardProfile(
         Condition condition,
         int refreshTicks,
         Template title,
-        List<Template> lines
+        List<BoardLine> lines,
+        ScoreNumbers scoreNumbers
 ) implements DisplayProfile {
 
     public BoardProfile {

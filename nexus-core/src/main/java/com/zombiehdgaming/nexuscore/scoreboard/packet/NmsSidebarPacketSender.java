@@ -4,6 +4,8 @@ import io.papermc.paper.adventure.PaperAdventure;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import net.minecraft.network.chat.numbers.BlankFormat;
+import net.minecraft.network.chat.numbers.FixedFormat;
+import net.minecraft.network.chat.numbers.NumberFormat;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientboundResetScorePacket;
 import net.minecraft.network.protocol.game.ClientboundSetDisplayObjectivePacket;
@@ -16,6 +18,7 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Sends sidebar packets directly. The objective exists only on the client; the server-side scoreboards are
@@ -23,7 +26,8 @@ import org.bukkit.entity.Player;
  * on Folia, where the Bukkit per-player scoreboard API is unsupported.
  *
  * <p>Lines use per-score display overrides (1.20.3+), so each line is a full component with no 40-character
- * team prefix/suffix limits, and {@link BlankFormat} hides the red score numbers.</p>
+ * team prefix/suffix limits. The objective uses {@link BlankFormat} so nothing shows on the right by default;
+ * lines that want right-aligned text (custom text or visible numbers) carry their own {@link FixedFormat}.</p>
  */
 public final class NmsSidebarPacketSender implements SidebarPacketSender {
 
@@ -49,9 +53,14 @@ public final class NmsSidebarPacketSender implements SidebarPacketSender {
     }
 
     @Override
-    public void setLine(final Player player, final String owner, final int score, final Component text) {
+    public void setLine(final Player player, final String owner, final int score, final Component text,
+                        final @Nullable Component scoreText) {
+        // A per-score FixedFormat overrides the objective's BlankFormat for just this line.
+        final Optional<NumberFormat> format = scoreText == null
+                ? Optional.empty()
+                : Optional.of(new FixedFormat(PaperAdventure.asVanilla(scoreText)));
         send(player, new ClientboundSetScorePacket(
-                owner, OBJECTIVE_NAME, score, Optional.of(PaperAdventure.asVanilla(text)), Optional.empty()));
+                owner, OBJECTIVE_NAME, score, Optional.of(PaperAdventure.asVanilla(text)), format));
     }
 
     @Override

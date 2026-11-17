@@ -2,6 +2,7 @@ package com.zombiehdgaming.nexuscore.scoreboard.packet;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Low-level sidebar protocol operations for a single client-side objective.
@@ -22,11 +23,12 @@ public interface SidebarPacketSender {
     /**
      * Creates or updates a line.
      *
-     * @param owner unique, invisible id of the line
-     * @param score sort key; higher is shown first
-     * @param text  the visible text
+     * @param owner     unique, invisible id of the line
+     * @param score     sort key; higher is shown first
+     * @param text      the visible text
+     * @param scoreText right-aligned text replacing the score number, or {@code null} to show nothing
      */
-    void setLine(Player player, String owner, int score, Component text);
+    void setLine(Player player, String owner, int score, Component text, @Nullable Component scoreText);
 
     void removeLine(Player player, String owner);
 }

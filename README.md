@@ -35,7 +35,7 @@ Both features support:
 
 | File | Purpose |
 |---|---|
-| `config.yml` | Feature switches, PlaceholderAPI expansion toggle, sidebar default visibility |
+| `config.yml` | Feature switches, PlaceholderAPI expansion toggle, sidebar default visibility and score numbers |
 | `scoreboards.yml` | Sidebar boards |
 | `tablist.yml` | Tab list layouts |
 | `animations.yml` | Named animations usable anywhere as `<animation:name>` |
@@ -50,9 +50,11 @@ boards:
     priority: 0              # highest matching priority wins
     update-interval: 20      # ticks (20 = 1s); only changed lines are sent
     title: "<animation:title>"
+    score-numbers: hidden    # hidden | shown (red numbers); default set in config.yml
     lines:
       - "<gray>Player <dark_gray>» <white>%nexus_player%"
-      - "<gray>Balance <dark_gray>» <green>%vault_eco_balance%"   # via PlaceholderAPI
+      - text: "<gray>Balance"               # left-aligned
+        score: "<green>%vault_eco_balance%"  # right-aligned, replaces the number
   nether:
     priority: 10
     conditions:
@@ -60,6 +62,11 @@ boards:
     title: "<red><bold>THE NETHER"
     lines: [ ... ]
 ```
+
+### Right-hand side of sidebar lines
+
+- **`score-numbers`** controls what lines show on the right where the score number would be: `hidden` (nothing, the default) or `shown` (vanilla-style red numbers counting down to 1). Each board can set it, and `scoreboard.default-score-numbers` in `config.yml` covers boards that don't.
+- **Per-line `score` text** replaces the number with any text, right-aligned, and always takes precedence over `score-numbers`. It supports placeholders and animations, and is re-sent only when it changes.
 
 ### Conditions
 

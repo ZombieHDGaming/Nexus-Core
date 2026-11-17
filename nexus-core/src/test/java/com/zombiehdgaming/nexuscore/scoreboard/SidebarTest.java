@@ -32,8 +32,8 @@ class SidebarTest {
         sidebar = new Sidebar(player, sender);
     }
 
-    private static List<Component> lines(final String... text) {
-        return java.util.Arrays.stream(text).map(Component::text).map(Component.class::cast).toList();
+    private static List<SidebarLine> lines(final String... text) {
+        return java.util.Arrays.stream(text).map(t -> SidebarLine.of(Component.text(t))).toList();
     }
 
     @Test
@@ -42,8 +42,8 @@ class SidebarTest {
 
         final InOrder order = inOrder(sender);
         order.verify(sender).create(player, Component.text("T"));
-        order.verify(sender).setLine(player, "nx-0", 15, Component.text("a"));
-        order.verify(sender).setLine(player, "nx-1", 14, Component.text("b"));
+        order.verify(sender).setLine(player, "nx-0", 15, Component.text("a"), null);
+        order.verify(sender).setLine(player, "nx-1", 14, Component.text("b"), null);
         verifyNoMoreInteractions(sender);
     }
 
@@ -64,7 +64,7 @@ class SidebarTest {
 
         sidebar.render(Component.text("T"), lines("a", "B", "c"));
 
-        verify(sender).setLine(player, "nx-1", 14, Component.text("B"));
+        verify(sender).setLine(player, "nx-1", 14, Component.text("B"), null);
         verifyNoMoreInteractions(sender);
     }
 
@@ -94,11 +94,11 @@ class SidebarTest {
 
     @Test
     void neverSendsMoreThanFifteenLines() {
-        final List<Component> twenty = IntStream.range(0, 20).mapToObj(i -> (Component) Component.text(i)).toList();
+        final List<SidebarLine> twenty = IntStream.range(0, 20).mapToObj(i -> SidebarLine.of(Component.text(i))).toList();
 
         sidebar.render(Component.text("T"), twenty);
 
-        verify(sender, org.mockito.Mockito.times(Sidebar.MAX_LINES)).setLine(any(), anyString(), anyInt(), any());
+        verify(sender, org.mockito.Mockito.times(Sidebar.MAX_LINES)).setLine(any(), anyString(), anyInt(), any(), any());
     }
 
     @Test
@@ -111,7 +111,24 @@ class SidebarTest {
         sidebar.render(Component.text("T"), lines("a"));
 
         verify(sender).create(player, Component.text("T"));
-        verify(sender).setLine(player, "nx-0", 15, Component.text("a"));
+        verify(sender).setLine(player, "nx-0", 15, Component.text("a"), null);
+    }
+
+    @Test
+    void scoreTextIsSentAndChangesTriggerResend() {
+        sidebar.render(Component.text("T"), List.of(new SidebarLine(Component.text("Ping"), Component.text("20ms"))));
+        verify(sender).setLine(player, "nx-0", 15, Component.text("Ping"), Component.text("20ms"));
+        clearInvocations(sender);
+
+        sidebar.render(Component.text("T"), List.of(new SidebarLine(Component.text("Ping"), Component.text("20ms"))));
+        verifyNoInteractions(sender);
+
+        sidebar.render(Component.text("T"), List.of(new SidebarLine(Component.text("Ping"), Component.text("35ms"))));
+        verify(sender).setLine(player, "nx-0", 15, Component.text("Ping"), Component.text("35ms"));
+
+        sidebar.render(Component.text("T"), List.of(SidebarLine.of(Component.text("Ping"))));
+        verify(sender).setLine(player, "nx-0", 15, Component.text("Ping"), null);
+        verifyNoMoreInteractions(sender);
     }
 
     @Test

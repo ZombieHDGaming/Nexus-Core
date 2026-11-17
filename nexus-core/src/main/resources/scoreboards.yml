@@ -32,10 +32,25 @@
 #    An unknown or invalid condition never matches (and is reported in the console),
 #    so a typo hides a board instead of showing it to everyone.
 #
+#  LINES
+#    At most 15. Each line is either a plain string, or text with right-aligned "score" text:
+#
+#      lines:
+#        - "<gray>A plain line"
+#        - ""                                  # blank line
+#        - text: "<gray>Ping"
+#          score: "<white>%nexus_ping%ms"      # shown on the right, where the number would be
+#
+#    'score' supports placeholders and animations like any other text.
+#
+#  RIGHT-HAND NUMBERS
+#    score-numbers  hidden | shown. What lines WITHOUT their own 'score' show on the right:
+#                   hidden = nothing, shown = red numbers counting down to 1.
+#                   Defaults to scoreboard.default-score-numbers in config.yml.
+#
 #  OTHER OPTIONS
 #    update-interval  ticks between refreshes (20 = 1 second). Only changed lines are
 #                     sent to the player, so frequent updates are cheap.
-#    lines            at most 15. Empty strings ("") make blank lines.
 
 boards:
 
@@ -47,9 +62,11 @@ boards:
       - "<dark_gray><st>                        </st>"
       - "<gray>Player <dark_gray>» <white>%nexus_player%"
       - "<gray>World <dark_gray>» <white>%nexus_world%"
-      - "<gray>Ping <dark_gray>» <white>%nexus_ping%ms"
+      - text: "<gray>Ping"
+        score: "<white>%nexus_ping%ms"
       - ""
-      - "<gray>Online <dark_gray>» <green>%nexus_online%<dark_gray>/</dark_gray><gray>%nexus_max_players%"
+      - text: "<gray>Online"
+        score: "<green>%nexus_online%<dark_gray>/</dark_gray><gray>%nexus_max_players%"
       - ""
       - "<animation:tips>"
       - "<dark_gray><st>                        </st>"
@@ -62,8 +79,10 @@ boards:
     title: "<gradient:#ef4444:#f97316><bold>THE NETHER</bold></gradient>"
     lines:
       - "<dark_gray><st>                        </st>"
-      - "<gray>Health <dark_gray>» <red>%nexus_health%❤"
-      - "<gray>Food <dark_gray>» <gold>%nexus_food%"
+      - text: "<gray>Health"
+        score: "<red>%nexus_health%❤"
+      - text: "<gray>Food"
+        score: "<gold>%nexus_food%"
       - ""
       - "<gray>X <white>%nexus_x% <gray>Y <white>%nexus_y% <gray>Z <white>%nexus_z%"
       - "<dark_gray><st>                        </st>"
@@ -74,6 +93,7 @@ boards:
       permission: nexuscore.board.staff
       gamemodes: [creative, spectator]
     update-interval: 20
+    score-numbers: shown
     title: "<red><bold>STAFF</bold></red>"
     lines:
       - "<gray>Online <dark_gray>» <white>%nexus_online%"

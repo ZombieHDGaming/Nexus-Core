@@ -1,6 +1,7 @@
 package com.zombiehdgaming.nexuscore.scoreboard;
 
 import com.zombiehdgaming.nexuscore.scoreboard.packet.SidebarPacketSender;
+import java.util.Arrays;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
@@ -9,10 +10,12 @@ import org.jspecify.annotations.Nullable;
 /**
  * Mirror of what one client's sidebar currently shows, used to send only what changed.
  *
- * <p>Line {@code i} always uses owner {@code nx-i} and score {@code MAX_LINES - i}. Scores are fixed per slot
- * rather than derived from the line count, so adding or removing lines at the bottom never forces the lines
- * above to be re-sent. Not thread-safe: owned by the player's thread, except {@link #hide()} which only sends
- * packets.</p>
+ * <p>Line {@code i} always uses owner {@code nx-i} and score {@code MAX_LINES - i}. Scores are only a sort key
+ * (the visible number, if any, is sent as right-aligned text), so they are fixed per slot: adding or removing
+ * lines at the bottom never forces the lines above to be re-sent. A line is re-sent when either its text or
+ * its right-aligned text changes.</p>
+ *
+ * <p>Not thread-safe: owned by the player's thread, except {@link #hide()} which only sends packets.</p>
  */
 public final class Sidebar {
 
@@ -28,7 +31,7 @@ public final class Sidebar {
 
     private final Player player;
     private final SidebarPacketSender sender;
-    private final Component[] lines = new Component[MAX_LINES];
+    private final SidebarLine[] lines = new SidebarLine[MAX_LINES];
     private int lineCount;
     private @Nullable Component title;
 
@@ -41,7 +44,7 @@ public final class Sidebar {
         return title != null;
     }
 
-    public void render(final Component newTitle, final List<Component> newLines) {
+    public void render(final Component newTitle, final List<SidebarLine> newLines) {
         if (title == null) {
             sender.create(player, newTitle);
             title = newTitle;
@@ -52,9 +55,9 @@ public final class Sidebar {
 
         final int count = Math.min(newLines.size(), MAX_LINES);
         for (int i = 0; i < count; i++) {
-            final Component line = newLines.get(i);
+            final SidebarLine line = newLines.get(i);
             if (i >= lineCount || !line.equals(lines[i])) {
-                sender.setLine(player, OWNERS[i], MAX_LINES - i, line);
+                sender.setLine(player, OWNERS[i], MAX_LINES - i, line.text(), line.score());
                 lines[i] = line;
             }
         }
@@ -71,6 +74,6 @@ public final class Sidebar {
         }
         title = null;
         lineCount = 0;
-        java.util.Arrays.fill(lines, null);
+        Arrays.fill(lines, null);
     }
 }

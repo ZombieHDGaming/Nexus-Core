@@ -73,7 +73,7 @@ public final class NexusCorePlugin extends JavaPlugin implements Listener {
 
         final ConditionParser conditions = new ConditionParser(logger);
         scoreboard = features.register(new ScoreboardFeature(
-                this, logger, text, conditions, new NmsSidebarPacketSender(), () -> settings.sidebarDefaultVisible()));
+                this, logger, text, conditions, new NmsSidebarPacketSender(), () -> settings));
         tabList = features.register(new TabListFeature(this, logger, text, conditions));
         features.apply(settings);
 
